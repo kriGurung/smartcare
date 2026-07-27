@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Build output
+client/dist/
+dist/
+build/
+
+node_modules/
+.env
+.env.local
+dist/
+build/
+coverage/
+.vscode/
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Local databases / fallback
+*.sqlite
+*.sqlite3
+
+# Uploaded files (keep the folders, ignore contents)
+server/src/uploads/documents/*
+server/src/uploads/photos/*
+!server/src/uploads/documents/.gitkeep
+!server/src/uploads/photos/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

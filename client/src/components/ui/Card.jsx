@@ -1,0 +1,30 @@
+export default function Card({ className = '', children, as: Comp = 'div', ...props }) {
+  return (
+    <Comp className={`card-base ${className}`} {...props}>
+      {children}
+    </Comp>
+  );
+}
+
+export function CardBody({ className = '', children }) {
+  return <div className={`p-5 sm:p-6 ${className}`}>{children}</div>;
+}
+
+export function CardHeader({ title, subtitle, icon: Icon, action }) {
+  return (
+    <div className="flex items-start justify-between gap-4 border-b border-slate-100 p-5 sm:p-6">
+      <div className="flex items-start gap-3">
+        {Icon && (
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600">
+            <Icon size={20} />
+          </span>
+        )}
+        <div>
+          <h3 className="text-lg font-semibold leading-tight text-ink">{title}</h3>
+          {subtitle && <p className="mt-0.5 text-sm text-ink-muted">{subtitle}</p>}
+        </div>
+      </div>
+      {action}
+    </div>
+  );
+}

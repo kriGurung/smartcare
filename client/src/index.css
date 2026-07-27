@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-surface-muted text-ink font-sans antialiased;
+    margin: 0;
+    min-height: 100vh;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display text-ink;
+  }
+  /* Large, comfortable tap targets for a low-literacy, all-ages audience (§18). */
+  button, a, input, select, textarea {
+    font-family: inherit;
+  }
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .input-base {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-ink
+           placeholder:text-ink-faint shadow-sm transition
+           focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-600/15;
+  }
+  .card-base {
+    @apply rounded-2xl bg-white shadow-card border border-slate-100;
+  }
+  .link-muted {
+    @apply text-ink-muted hover:text-brand-600 transition-colors;
+  }
+  .scroll-none::-webkit-scrollbar { display: none; }
+  .scroll-none { -ms-overflow-style: none; scrollbar-width: none; }
+}
