@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Mono:wght@400;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --background: 40 33% 97%;
+  --foreground: 201 38% 19%;
+  --border: 38 23% 87%;
+  --input: 38 23% 87%;
+  --ring: 172 55% 36%;
+  --card: 0 0% 100%;
+  --card-foreground: 201 38% 19%;
+  --primary: 172 55% 36%;
+  --primary-foreground: 40 33% 97%;
+  --secondary: 38 53% 91%;
+  --secondary-foreground: 201 38% 19%;
+  --muted: 39 25% 92%;
+  --muted-foreground: 201 15% 45%;
+  --accent: 13 62% 59%;
+  --accent-foreground: 40 33% 97%;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+  body { @apply bg-background text-foreground font-sans antialiased; margin:0; min-height:100vh; }
+  h1,h2,h3,h4 { @apply text-foreground; }
+  button,a,input,select,textarea { font-family:inherit; }
+  * { -webkit-tap-highlight-color:transparent; }
+  ::selection { background:hsl(var(--primary) / .18); color:hsl(var(--foreground)); }
+}
+
+@layer components {
+  .page-shell { @apply mx-auto w-full max-w-7xl px-5 sm:px-8; }
+  .display { font-family:'Fraunces', Georgia, serif; letter-spacing:-.035em; }
+  .mono { font-family:'Space Mono', monospace; }
+  .eyebrow { font-family:'Space Mono', monospace; @apply text-[10px] font-bold uppercase tracking-[.18em] text-primary; }
+  .card-base { @apply rounded-[1.35rem] border border-border bg-card; box-shadow:0 4px 18px rgba(38,68,68,.06); }
+  .soft-panel { @apply rounded-[1.5rem] border border-primary/15 bg-primary/5; }
+  .input-base { @apply w-full rounded-xl border border-border bg-card px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10; }
+  .link-muted { @apply text-muted-foreground transition-colors hover:text-primary; }
+  .section-space { @apply py-14 sm:py-20; }
+  .scroll-none::-webkit-scrollbar { display:none; }
+  .scroll-none { -ms-overflow-style:none; scrollbar-width:none; }
+  .photo-natural { @apply object-cover object-center; }
+}
+
+@keyframes rise { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+.animate-rise { animation:rise .65s both; }

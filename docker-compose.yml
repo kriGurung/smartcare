@@ -1,0 +1,69 @@
+# SmartCare — optional local stack in containers (for a demo on any machine).
+#
+#   docker compose up --build
+#     → PWA at http://localhost:8080   (nginx, proxies /api to the API)
+#     → API at http://localhost:5000   (Express + MySQL)
+#     → MySQL on localhost:3307
+#
+# First run creates an empty schema; load demo data with:
+#   docker compose exec api node src/utils/seed.js
+#
+# NOTE: this mirrors the IR architecture but production uses RDS MySQL on EC2 —
+# see deploy/ec2-setup.md. Secrets below are dev-only.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      CLIENT_ORIGIN: http://localhost:8080
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: smartcare
+      DB_USER: smartcare
+      DB_PASSWORD: smartcare_dev_only
+      DB_DIALECT: mysql
+      DB_SYNC: safe
+      JWT_ACCESS_SECRET: compose_dev_access_secret_change_me
+      JWT_REFRESH_SECRET: compose_dev_refresh_secret_change_me
+      FIELD_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      UPLOAD_DIR: /var/lib/smartcare/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    volumes:
+      - uploads:/var/lib/smartcare/uploads
+
+  web:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root_dev_only
+      MYSQL_DATABASE: smartcare
+      MYSQL_USER: smartcare
+      MYSQL_PASSWORD: smartcare_dev_only
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot_dev_only"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+volumes:
+  dbdata:
+  uploads:

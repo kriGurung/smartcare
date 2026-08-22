@@ -1,0 +1,16 @@
+{
+  "name": "smartcare",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SmartCare — verified caregiver rental platform (Node/Express API + React PWA). Runs locally on Windows with Laragon MySQL.",
+  "scripts": {
+    "dev": "concurrently -n \"API,WEB\" -c \"blue,green\" \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "start": "npm --prefix server start",
+    "seed": "npm --prefix server run seed",
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "build": "npm --prefix client run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

@@ -1,0 +1,27 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SmartCare logo mark">
+  <defs>
+    <linearGradient id="scShield" x1="256" y1="56" x2="256" y2="456" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+    <linearGradient id="scCheck" x1="228" y1="188" x2="288" y2="232" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+    <filter id="scSoft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#2563EB" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Shield: protection / verification -->
+  <path filter="url(#scSoft)" d="M120 92 L392 92 C405 92 416 103 416 116 L416 244 C416 342 354 416 256 452 C158 416 96 342 96 244 L96 116 C96 103 107 92 120 92 Z" fill="url(#scShield)"/>
+
+  <!-- Inner top highlight for depth -->
+  <path d="M120 92 L392 92 C405 92 416 103 416 116 L416 190 C360 168 300 158 256 158 C212 158 152 168 96 190 L96 116 C96 103 107 92 120 92 Z" fill="#FFFFFF" fill-opacity="0.10"/>
+
+  <!-- Heart: care -->
+  <path d="M256 286 C256 286 190 246 190 198 C190 174 208 158 230 158 C244 158 253 167 256 176 C259 167 268 158 282 158 C304 158 322 174 322 198 C322 246 256 286 256 286 Z" fill="#FFFFFF"/>
+
+  <!-- Verified check inside the heart -->
+  <path d="M228 208 L249 230 L289 184" stroke="url(#scCheck)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

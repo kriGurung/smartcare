@@ -1,0 +1,30 @@
+<svg width="880" height="240" viewBox="0 0 880 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SmartCare — Verified care, on demand">
+  <defs>
+    <linearGradient id="lfShield" x1="120" y1="30" x2="120" y2="210" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+    <linearGradient id="lfCheck" x1="104" y1="86" x2="136" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+    <linearGradient id="lfWord" x1="300" y1="90" x2="770" y2="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mark (scaled ~0.44 of 512 => ~226 tall, positioned) -->
+  <g transform="translate(30,20) scale(0.39)">
+    <path d="M120 92 L392 92 C405 92 416 103 416 116 L416 244 C416 342 354 416 256 452 C158 416 96 342 96 244 L96 116 C96 103 107 92 120 92 Z" fill="url(#lfShield)"/>
+    <path d="M120 92 L392 92 C405 92 416 103 416 116 L416 190 C360 168 300 158 256 158 C212 158 152 168 96 190 L96 116 C96 103 107 92 120 92 Z" fill="#FFFFFF" fill-opacity="0.10"/>
+    <path d="M256 286 C256 286 190 246 190 198 C190 174 208 158 230 158 C244 158 253 167 256 176 C259 167 268 158 282 158 C304 158 322 174 322 198 C322 246 256 286 256 286 Z" fill="#FFFFFF"/>
+    <path d="M228 208 L249 230 L289 184" stroke="url(#lfCheck)" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="238" y="128" font-family="Poppins, 'Segoe UI', system-ui, sans-serif" font-size="76" font-weight="700" letter-spacing="-1">
+    <tspan fill="#1E293B">Smart</tspan><tspan fill="url(#lfWord)">Care</tspan>
+  </text>
+  <text x="240" y="176" font-family="Inter, 'Segoe UI', system-ui, sans-serif" font-size="26" font-weight="500" letter-spacing="0.5" fill="#64748B">Verified care, on demand</text>
+</svg>

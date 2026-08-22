@@ -1,0 +1,33 @@
+# SmartCare API — systemd unit for the AWS EC2 t2.micro instance.
+#
+# Install:  sudo cp deploy/smartcare-api.service /etc/systemd/system/
+#           sudo systemctl daemon-reload
+#           sudo systemctl enable --now smartcare-api
+#
+# Secrets are read from /srv/smartcare/server/.env (EnvironmentFile only
+# overrides empty values, so .env wins for everything).
+
+[Unit]
+Description=SmartCare API (Express + MySQL)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/srv/smartcare/server
+EnvironmentFile=/srv/smartcare/server/.env
+ExecStart=/usr/bin/node src/server.js
+Restart=on-failure
+RestartSec=5
+# Uploaded caregiver documents/photos live on the instance disk for the
+# prototype; mirror this directory (or migrate to S3) for durable backups.
+ReadWritePaths=/var/lib/smartcare/uploads
+
+# Hardening (best-effort on t2.micro)
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

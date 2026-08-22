@@ -1,0 +1,48 @@
+name: Deploy (EC2)
+
+on:
+  push:
+    branches: [main]
+
+# One deploy at a time — stop a stale run if a newer push lands first.
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Build and test before deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: API tests
+        working-directory: server
+        run: |
+          npm ci
+          npm test
+      - name: PWA build
+        working-directory: client
+        run: |
+          npm ci
+          npm run build
+
+  deploy:
+    name: Deploy to EC2
+    needs: checks
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: SSH deploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            cd /srv/smartcare
+            bash deploy/deploy.sh
