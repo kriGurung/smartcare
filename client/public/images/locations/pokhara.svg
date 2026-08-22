@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1F9D8B;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#178577;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0F554E;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#43BFA6;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#1F9D8B;stop-opacity:0.05"/>
+    </linearGradient>
+    <linearGradient id="lake" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.08)"/>
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0.03)"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect width="800" height="200" fill="url(#sky)"/>
+  <!-- Mountains - Annapurna range -->
+  <polygon points="0,300 80,160 180,250 280,130 380,220 460,100 540,180 620,120 700,200 800,160 800,500 0,500" fill="rgba(255,255,255,0.06)"/>
+  <polygon points="0,350 100,230 200,310 320,200 420,280 520,190 620,260 720,210 800,270 800,500 0,500" fill="rgba(255,255,255,0.04)"/>
+  <!-- Snow caps -->
+  <polygon points="265,130 280,130 295,150 250,150" fill="rgba(255,255,255,0.15)"/>
+  <polygon points="445,100 460,100 475,125 430,125" fill="rgba(255,255,255,0.18)"/>
+  <polygon points="605,120 620,120 635,145 590,145" fill="rgba(255,255,255,0.15)"/>
+  <!-- Phewa Lake -->
+  <ellipse cx="400" cy="420" rx="380" ry="50" fill="url(#lake)"/>
+  <ellipse cx="400" cy="415" rx="300" ry="25" fill="rgba(255,255,255,0.04)"/>
+  <!-- Lake reflection lines -->
+  <line x1="150" y1="410" x2="250" y2="410" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <line x1="350" y1="415" x2="480" y2="415" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  <line x1="550" y1="408" x2="650" y2="408" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <!-- Small buildings on shore -->
+  <rect x="120" y="370" width="25" height="35" rx="2" fill="rgba(255,255,255,0.06)"/>
+  <rect x="160" y="375" width="20" height="30" rx="2" fill="rgba(255,255,255,0.05)"/>
+  <rect x="600" y="365" width="28" height="40" rx="2" fill="rgba(255,255,255,0.06)"/>
+  <rect x="640" y="372" width="22" height="33" rx="2" fill="rgba(255,255,255,0.05)"/>
+  <!-- Boats on lake -->
+  <ellipse cx="300" cy="425" rx="18" ry="4" fill="rgba(255,255,255,0.08)"/>
+  <line x1="300" y1="425" x2="300" y2="415" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <ellipse cx="520" cy="420" rx="15" ry="3" fill="rgba(255,255,255,0.07)"/>
+  <!-- Ground -->
+  <rect x="0" y="450" width="800" height="50" fill="rgba(0,0,0,0.1)"/>
+  <!-- Ambient -->
+  <circle cx="100" cy="70" r="2" fill="rgba(255,255,255,0.25)"/>
+  <circle cx="350" cy="55" r="1.5" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="680" cy="80" r="2" fill="rgba(255,255,255,0.3)"/>
+</svg>

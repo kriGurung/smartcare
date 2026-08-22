@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C4662A;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#8B4513;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8A87C;stop-opacity:0.35"/>
+      <stop offset="100%" style="stop-color:#C4662A;stop-opacity:0.05"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect width="800" height="220" fill="url(#sky)"/>
+  <!-- Patan Durbar Square - multi-tiered pagoda -->
+  <rect x="300" y="250" width="200" height="150" rx="4" fill="rgba(255,255,255,0.08)"/>
+  <!-- Tier 1 -->
+  <polygon points="280,250 400,210 520,250" fill="rgba(255,255,255,0.1)"/>
+  <!-- Tier 2 -->
+  <polygon points="300,210 400,180 500,210" fill="rgba(255,255,255,0.08)"/>
+  <!-- Tier 3 -->
+  <polygon points="330,180 400,155 470,180" fill="rgba(255,255,255,0.07)"/>
+  <!-- Spire -->
+  <rect x="396" y="130" width="8" height="25" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="400" cy="128" r="6" fill="rgba(255,255,255,0.1)"/>
+  <!-- Courtyard columns -->
+  <rect x="320" y="400" width="8" height="40" rx="2" fill="rgba(255,255,255,0.08)"/>
+  <rect x="360" y="400" width="8" height="40" rx="2" fill="rgba(255,255,255,0.08)"/>
+  <rect x="432" y="400" width="8" height="40" rx="2" fill="rgba(255,255,255,0.08)"/>
+  <rect x="472" y="400" width="8" height="40" rx="2" fill="rgba(255,255,255,0.08)"/>
+  <!-- Side buildings -->
+  <rect x="80" y="320" width="70" height="120" rx="3" fill="rgba(255,255,255,0.06)"/>
+  <polygon points="75,320 115,285 155,320" fill="rgba(255,255,255,0.06)"/>
+  <rect x="620" y="300" width="60" height="140" rx="3" fill="rgba(255,255,255,0.05)"/>
+  <polygon points="615,300 650,270 685,300" fill="rgba(255,255,255,0.05)"/>
+  <!-- Windows -->
+  <rect x="95" y="345" width="15" height="15" rx="2" fill="rgba(255,255,255,0.1)"/>
+  <rect x="118" y="345" width="15" height="15" rx="2" fill="rgba(255,255,255,0.1)"/>
+  <rect x="635" y="325" width="12" height="12" rx="2" fill="rgba(255,255,255,0.08)"/>
+  <rect x="653" y="325" width="12" height="12" rx="2" fill="rgba(255,255,255,0.08)"/>
+  <!-- Ground -->
+  <rect x="0" y="440" width="800" height="60" fill="rgba(0,0,0,0.12)"/>
+  <!-- Ambient dots -->
+  <circle cx="150" cy="70" r="1.5" fill="rgba(255,255,255,0.25)"/>
+  <circle cx="600" cy="90" r="2" fill="rgba(255,255,255,0.2)"/>
+  <circle cx="700" cy="55" r="1.5" fill="rgba(255,255,255,0.3)"/>
+</svg>
