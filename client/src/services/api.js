@@ -84,11 +84,22 @@ export function errMsg(error, fallback = 'Something went wrong. Please try again
   const data = error?.response?.data;
   if (!data) return error?.message || fallback;
   if (typeof data === 'string') return data;
-  if (data.message) return data.message;
+  const err = data.error || data;
+  if (err.message) return err.message;
+  if (Array.isArray(err.errors) && err.errors.length) {
+    return err.errors.map((e) => e.msg || e.message).filter(Boolean).join(' ');
+  }
   if (Array.isArray(data.errors) && data.errors.length) {
     return data.errors.map((e) => e.msg || e.message).filter(Boolean).join(' ');
   }
   return fallback;
+}
+
+// Extracts structured details from an API error response (e.g. OUTSIDE_PERIMETER).
+export function errDetails(error) {
+  const data = error?.response?.data;
+  const err = data?.error || data;
+  return err?.details || null;
 }
 
 export default api;

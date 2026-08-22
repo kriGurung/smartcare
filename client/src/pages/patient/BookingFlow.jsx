@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Home, Building2, Check, CalendarClock, MapPin,
-  ClipboardCheck, Loader2,
+  ClipboardCheck, Loader2, Navigation,
 } from 'lucide-react';
 import api, { errMsg } from '../../services/api.js';
+import { getCurrentPosition } from '../../lib/geolocation.js';
 import Avatar from '../../components/Avatar.jsx';
 import Button from '../../components/ui/Button.jsx';
 import Card, { CardBody } from '../../components/ui/Card.jsx';
@@ -49,6 +50,10 @@ export default function BookingFlow() {
     end: '',
     patient_note: '',
   });
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState('');
 
   useEffect(() => {
     api.get(`/caregivers/${caregiverId}`)
@@ -72,6 +77,20 @@ export default function BookingFlow() {
   const estimatedTotal = caregiver ? Math.round(hours * caregiver.hourlyRatePaisa) : 0;
 
   function set(key, val) { setForm((f) => ({ ...f, [key]: val })); }
+
+  async function pinLocation() {
+    setGeoLoading(true);
+    setGeoError('');
+    try {
+      const pos = await getCurrentPosition();
+      setLatitude(pos.latitude);
+      setLongitude(pos.longitude);
+    } catch (e) {
+      setGeoError(e.message);
+    } finally {
+      setGeoLoading(false);
+    }
+  }
 
   function validateStep() {
     setError('');
@@ -108,6 +127,8 @@ export default function BookingFlow() {
         start_datetime: new Date(form.start).toISOString(),
         end_datetime: new Date(form.end).toISOString(),
         patient_note: form.patient_note.trim() || undefined,
+        latitude: latitude || undefined,
+        longitude: longitude || undefined,
       };
       const res = await api.post('/bookings', payload);
       navigate(`/patient/bookings/${res.data.booking.id}`, { replace: true });
@@ -224,6 +245,25 @@ export default function BookingFlow() {
                 onChange={(e) => set('address', e.target.value)}
                 placeholder={form.location_type === 'hospital' ? 'Ward 5, Bed 12, Kathmandu' : 'Street, area, city'}
               />
+              <div>
+                <label className="mb-1 block text-sm font-medium text-ink-soft">Pin your exact location <span className="font-normal text-ink-faint">(recommended)</span></label>
+                {latitude ? (
+                  <div className="flex items-center gap-2 rounded-xl border border-care-200 bg-care-50 px-4 py-3 text-sm font-medium text-care-700">
+                    <Navigation size={15} />
+                    Location shared &#10003;
+                    <button type="button" onClick={() => { setLatitude(null); setLongitude(null); setGeoError(''); }} className="ml-auto text-xs font-semibold text-care-500 hover:text-care-700">Remove</button>
+                  </div>
+                ) : (
+                  <div>
+                    <button type="button" onClick={pinLocation} disabled={geoLoading} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-ink-soft transition hover:border-brand-400 hover:text-brand-600 disabled:opacity-50">
+                      {geoLoading ? <Loader2 size={15} className="animate-spin" /> : <Navigation size={15} />}
+                      {geoLoading ? 'Getting your location...' : 'Use my current location'}
+                    </button>
+                    {geoError && <p className="mt-1.5 text-xs text-red-600">{geoError}</p>}
+                    <p className="mt-1 text-xs text-ink-faint">Your caregiver will use this to verify their arrival at the visit location.</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -265,6 +305,7 @@ export default function BookingFlow() {
                   <Row label="Service" value={c.services?.find((s) => String(s.id) === form.service_id)?.name || 'General care'} />
                   <Row label="Location" value={form.location_type === 'hospital' ? `Hospital — ${form.hospital_name}` : 'Home visit'} />
                   <Row label="Address" value={form.address} />
+                  {latitude && <Row label="Location pinned" value={`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`} />}
                   <Row label="Start" value={new Date(form.start).toLocaleString()} />
                   <Row label="End" value={new Date(form.end).toLocaleString()} />
                   <Row label="Duration" value={formatHours(hours)} />

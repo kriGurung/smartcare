@@ -4,7 +4,8 @@ import {
   ArrowLeft, MapPin, Building2, Clock, Phone, CreditCard, Check, X, Play,
   CheckCircle2, ClipboardList, Plus, Star, Info, ShieldAlert, Wallet, CalendarClock,
 } from 'lucide-react';
-import api, { errMsg } from '../services/api.js';
+import api, { errMsg, errDetails } from '../services/api.js';
+import { getCurrentPosition } from '../lib/geolocation.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import Avatar from '../components/Avatar.jsx';
@@ -37,7 +38,70 @@ export default function BookingDetail() {
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [manualInfo, setManualInfo] = useState('');
   const [confirmAction, setConfirmAction] = useState(null);
+  const [overrideOpen, setOverrideOpen] = useState(false);
+  const [overrideCoords, setOverrideCoords] = useState(null);
+  const [overrideInfo, setOverrideInfo] = useState(null);
+  const [geoBusy, setGeoBusy] = useState(false);
   const toast = useToast();
+
+  async function startVisit() {
+    setBusy(true);
+    setError('');
+    setGeoBusy(true);
+    let coords = null;
+    try {
+      coords = await getCurrentPosition();
+    } catch (e) {
+      setError(e.message);
+      setBusy(false);
+      setGeoBusy(false);
+      return;
+    }
+    setGeoBusy(false);
+    try {
+      await api.put(`/bookings/${id}/status`, {
+        action: 'start',
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+      });
+      toast('Visit started successfully.', 'success');
+      await load();
+    } catch (e) {
+      const details = errDetails(e);
+      if (details?.code === 'OUTSIDE_PERIMETER') {
+        setOverrideCoords(coords);
+        setOverrideInfo(details);
+        setOverrideOpen(true);
+        setBusy(false);
+      } else {
+        setError(errMsg(e, 'Could not start this visit.'));
+        setBusy(false);
+      }
+    }
+  }
+
+  async function completeVisit() {
+    setBusy(true);
+    setError('');
+    let coords = null;
+    try {
+      coords = await getCurrentPosition();
+    } catch (_) {
+      // best-effort — proceed without coords
+    }
+    try {
+      await api.put(`/bookings/${id}/status`, {
+        action: 'complete',
+        ...(coords ? { latitude: coords.latitude, longitude: coords.longitude } : {}),
+      });
+      toast('Visit marked complete.', 'success');
+      await load();
+    } catch (e) {
+      setError(errMsg(e, 'Could not complete this visit.'));
+    } finally {
+      setBusy(false);
+    }
+  }
 
   const load = useCallback(async () => {
     try {
@@ -197,6 +261,36 @@ export default function BookingDetail() {
               </CardBody>
             </Card>
           )}
+
+          {/* Attendance / check-in card */}
+          {b.check_in_at && (
+            <Card>
+              <CardHeader title="Attendance" icon={MapPin} />
+              <CardBody className="space-y-3">
+                <Detail icon={Clock} label="Checked in" value={formatDateTime(b.check_in_at)} />
+                {b.check_in_distance_m != null && (
+                  <Detail icon={MapPin} label="Distance from location" value={`${b.check_in_distance_m} m`} />
+                )}
+                {b.check_in_outside_perimeter ? (
+                  <div className="flex items-start gap-2 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    <ShieldAlert size={16} className="mt-0.5 shrink-0" />
+                    <div>
+                      <span className="font-semibold">Outside expected radius</span>
+                      {b.check_in_override_reason && (
+                        <p className="mt-1 text-xs text-amber-700">Reason: {b.check_in_override_reason}</p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 rounded-xl bg-care-50 px-4 py-3 text-sm font-medium text-care-700">
+                    <CheckCircle2 size={15} />
+                    Verified within the expected location radius
+                  </div>
+                )}
+                {b.check_out_at && <Detail icon={Clock} label="Checked out" value={formatDateTime(b.check_out_at)} />}
+              </CardBody>
+            </Card>
+          )}
         </div>
 
         {/* Sidebar: pricing + actions */}
@@ -237,8 +331,8 @@ export default function BookingDetail() {
                     <Button variant="outline" icon={X} loading={busy} onClick={() => setConfirmAction('decline')}>Decline</Button>
                   </div>
                 )}
-                {cgCanStart && <Button icon={Play} className="w-full" loading={busy} onClick={() => act('start')}>Start visit</Button>}
-                {cgCanComplete && <Button variant="care" icon={CheckCircle2} className="w-full" loading={busy} onClick={() => act('complete')}>Mark complete</Button>}
+                {cgCanStart && <Button icon={Play} className="w-full" loading={busy || geoBusy} onClick={startVisit}>Start visit</Button>}
+                {cgCanComplete && <Button variant="care" icon={CheckCircle2} className="w-full" loading={busy || geoBusy} onClick={completeVisit}>Mark complete</Button>}
                 {patientCanCancel && <Button variant="ghost" icon={X} className="w-full text-danger" loading={busy} onClick={() => setConfirmAction('cancel')}>Cancel booking</Button>}
               </div>
             </CardBody>
@@ -255,6 +349,18 @@ export default function BookingDetail() {
       {reviewOpen && <ReviewModal bookingId={b.id} onClose={() => setReviewOpen(false)} onDone={() => { setReviewOpen(false); load(); }} />}
       {logOpen && <CareLogModal bookingId={b.id} onClose={() => setLogOpen(false)} onDone={() => { setLogOpen(false); load(); }} />}
       {rescheduleOpen && <RescheduleModal booking={b} onClose={() => setRescheduleOpen(false)} onDone={(msg) => { setRescheduleOpen(false); toast(msg || 'Booking rescheduled.', 'success'); load(); }} />}
+
+      {overrideOpen && overrideCoords && (
+        <OverridePerimeterModal
+          distance={overrideInfo?.distanceMeters}
+          radius={overrideInfo?.radiusMeters}
+          coords={overrideCoords}
+          bookingId={id}
+          onClose={() => { setOverrideOpen(false); setOverrideCoords(null); setOverrideInfo(null); }}
+          onDone={() => { setOverrideOpen(false); setOverrideCoords(null); setOverrideInfo(null); load(); }}
+          toast={toast}
+        />
+      )}
 
       {confirmAction && (
         <ConfirmDialog
@@ -500,6 +606,63 @@ function CareLogModal({ bookingId, onClose, onDone }) {
           <option value="fair">Fair</option>
           <option value="poor">Poor</option>
         </Select>
+      </div>
+    </Modal>
+  );
+}
+
+// ── Override perimeter modal ─────────────────────────
+function OverridePerimeterModal({ distance, radius, coords, bookingId, onClose, onDone, toast }) {
+  const [reason, setReason] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const valid = reason.trim().length >= 5;
+
+  async function submit() {
+    setLoading(true);
+    setError('');
+    try {
+      await api.put(`/bookings/${bookingId}/status`, {
+        action: 'start',
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        reason: reason.trim(),
+      });
+      toast('Visit started with location override.', 'success');
+      onDone();
+    } catch (e) {
+      setError(errMsg(e, 'Could not start the visit.'));
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title="Outside visit location"
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button icon={Play} loading={loading} disabled={!valid} onClick={submit}>Start visit anyway</Button>
+        </>
+      }
+    >
+      {error && <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</div>}
+      <div className="space-y-4">
+        <div className="rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
+          <p>You are <span className="font-bold">{distance != null ? `${distance} m` : 'far'}</span> from the visit location (radius: {radius != null ? `${radius} m` : '150 m'}).</p>
+          <p className="mt-1 text-xs text-amber-700">This will be recorded for admin review. GPS can be inaccurate indoors.</p>
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-ink-soft">Reason for override (min 5 characters)</label>
+          <textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            className="input-base min-h-[80px]"
+            placeholder="e.g. GPS is inaccurate indoors, I am at the building entrance..."
+          />
+        </div>
       </div>
     </Modal>
   );

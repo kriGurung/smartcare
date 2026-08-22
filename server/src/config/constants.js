@@ -68,6 +68,7 @@ export const NOTIFICATION_TYPES = Object.freeze({
 
 // Default platform commission (percent). Editable by Admin in Settings.
 export const DEFAULT_COMMISSION_PERCENT = 10;
+export const DEFAULT_CHECKIN_RADIUS_METERS = 150;
 
 export const SERVICE_CATALOGUE = [
   { name: 'Elderly Care', description: 'Daily living assistance, mobility, and companionship for seniors.' },

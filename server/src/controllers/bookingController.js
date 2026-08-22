@@ -3,7 +3,8 @@ import asyncHandler from '../utils/asyncHandler.js';
 import ApiError from '../utils/apiError.js';
 import { recordAudit } from '../services/auditService.js';
 import { notify } from '../services/notificationService.js';
-import { getCommissionPercent } from './adminController.js';
+import { getCommissionPercent, getCheckinRadiusMeters } from './adminController.js';
+import { distanceMeters } from '../utils/geo.js';
 import {
   ROLES,
   VERIFICATION_STATUS,
@@ -35,6 +36,7 @@ export const createBooking = asyncHandler(async (req, res) => {
   const {
     caregiver_id, service_id, location_type, address, hospital_name,
     start_datetime, end_datetime, patient_note,
+    latitude, longitude,
   } = req.body;
 
   if (!Object.values(LOCATION_TYPE).includes(location_type)) {
@@ -93,6 +95,8 @@ export const createBooking = asyncHandler(async (req, res) => {
     caregiver_earning_paisa: earning,
     status: BOOKING_STATUS.PENDING,
     patient_note: patient_note || null,
+    latitude: latitude || null,
+    longitude: longitude || null,
   });
 
   await recordAudit({ userId: req.user.id, action: 'booking_create', resource: `booking:${booking.id}`, ip: req.ip });
@@ -212,9 +216,60 @@ export const updateBookingStatus = asyncHandler(async (req, res) => {
     return res.json({ booking: full });
   }
 
+  // ── Geofenced check-in for "start" action ──────────────────────────────
+  let checkInMeta = {};
+  if (action === 'start' && !isAdmin) {
+    const { latitude: lat, longitude: lng, reason } = req.body;
+    if (lat == null || lng == null) {
+      throw ApiError.badRequest('Location is required to start a visit', { code: 'LOCATION_REQUIRED' });
+    }
+
+    // If the patient pinned a location, compare against it
+    if (booking.latitude != null && booking.longitude != null) {
+      const radius = await getCheckinRadiusMeters();
+      const dist = distanceMeters(
+        Number(booking.latitude), Number(booking.longitude),
+        Number(lat), Number(lng)
+      );
+      const outside = dist > radius;
+
+      if (outside && !reason) {
+        throw ApiError.conflict('You appear to be outside the visit location.', {
+          code: 'OUTSIDE_PERIMETER',
+          distanceMeters: dist,
+          radiusMeters: radius,
+        });
+      }
+
+      checkInMeta = {
+        check_in_distance_m: dist,
+        check_in_outside_perimeter: outside,
+        check_in_override_reason: outside ? reason : null,
+      };
+    }
+
+    checkInMeta.check_in_at = new Date();
+    checkInMeta.check_in_lat = lat;
+    checkInMeta.check_in_lng = lng;
+  }
+
   booking.status = rule.to;
   if (action === 'decline') booking.decline_reason = reason || null;
   if (action === 'cancel') booking.cancelled_by = req.user.id;
+
+  // Apply check-in fields
+  Object.assign(booking, checkInMeta);
+
+  // Best-effort check-out logging for "complete"
+  if (action === 'complete') {
+    const { latitude: lat, longitude: lng } = req.body;
+    if (lat != null && lng != null) {
+      booking.check_out_at = new Date();
+      booking.check_out_lat = lat;
+      booking.check_out_lng = lng;
+    }
+  }
+
   await booking.save();
 
   // Auto-refund paid payments on cancellation.
@@ -240,7 +295,7 @@ export const updateBookingStatus = asyncHandler(async (req, res) => {
     userId: req.user.id,
     action: `booking_${action}`,
     resource: `booking:${booking.id}`,
-    meta: { newStatus: rule.to },
+    meta: { newStatus: rule.to, ...checkInMeta },
     ip: req.ip,
   });
 

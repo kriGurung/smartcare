@@ -28,6 +28,8 @@ router.post(
     body('address').trim().isLength({ min: 3, max: 300 }).withMessage('Address is required'),
     body('start_datetime').isISO8601().withMessage('Valid start date/time required'),
     body('end_datetime').isISO8601().withMessage('Valid end date/time required'),
+    body('latitude').optional({ values: 'null' }).isFloat({ min: -90, max: 90 }),
+    body('longitude').optional({ values: 'null' }).isFloat({ min: -180, max: 180 }),
   ],
   validate,
   createBooking
@@ -37,7 +39,12 @@ router.get('/', listBookings);
 router.get('/:id', getBooking);
 router.put(
   '/:id/status',
-  [body('action').isIn(['accept', 'decline', 'start', 'complete', 'cancel', 'reschedule'])],
+  [
+    body('action').isIn(['accept', 'decline', 'start', 'complete', 'cancel', 'reschedule']),
+    body('latitude').optional({ values: 'null' }).isFloat({ min: -90, max: 90 }),
+    body('longitude').optional({ values: 'null' }).isFloat({ min: -180, max: 180 }),
+    body('reason').optional().isLength({ max: 300 }),
+  ],
   validate,
   updateBookingStatus
 );

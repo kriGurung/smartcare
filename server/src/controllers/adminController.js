@@ -13,6 +13,7 @@ import {
   PAYMENT_STATUS,
   NOTIFICATION_TYPES,
   DEFAULT_COMMISSION_PERCENT,
+  DEFAULT_CHECKIN_RADIUS_METERS,
 } from '../config/constants.js';
 import {
   User,
@@ -29,6 +30,13 @@ export async function getCommissionPercent() {
   const s = await Setting.findByPk('commission_percent');
   const v = s?.value;
   return typeof v === 'number' ? v : DEFAULT_COMMISSION_PERCENT;
+}
+
+// Shared helper — check-in perimeter radius in metres.
+export async function getCheckinRadiusMeters() {
+  const s = await Setting.findByPk('checkin_radius_meters');
+  const v = s?.value;
+  return typeof v === 'number' ? v : DEFAULT_CHECKIN_RADIUS_METERS;
 }
 
 // GET /api/admin/caregivers/pending

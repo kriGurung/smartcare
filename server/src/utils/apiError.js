@@ -11,6 +11,6 @@ export default class ApiError extends Error {
   static unauthorized(msg = 'Authentication required') { return new ApiError(401, msg); }
   static forbidden(msg = 'You do not have permission to do that') { return new ApiError(403, msg); }
   static notFound(msg = 'Resource not found') { return new ApiError(404, msg); }
-  static conflict(msg) { return new ApiError(409, msg); }
+  static conflict(msg, details) { return new ApiError(409, msg, details); }
   static tooMany(msg = 'Too many requests') { return new ApiError(429, msg); }
 }
